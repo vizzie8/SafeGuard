@@ -27,4 +27,4 @@ Test 6 — Power-Off / Tab Close SOS
 
 Activate monitoring in Settings
 Close the browser tab
-Verify: Browser shows leave-page warning + SMS intent fires (note: sendBeacon fires silently)
+Verify: Browser shows leave-page warning + SMS intent fires 
