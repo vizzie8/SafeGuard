@@ -1,6 +1,5 @@
 
 Test 1 — Heatmap
-
 Open app → Home tab
 Verify colored circles appear on map
 Click a circle → tooltip shows street name + risk level
