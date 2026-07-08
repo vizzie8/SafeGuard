@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="SafeGuard — Women & Children Safety App with heatmaps, SOS alerts, voice detection, and motion sensing." />
+  <meta name="theme-color" content="#0a0612" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>SafeGuard — Women & Children Safety</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- App CSS -->
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+
+</head>
+<body>
+
+<div class="ambient-bg">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<header class="app-header">
+  <div class="app-logo">
+    <div class="logo-icon">🛡️</div>
+    <span class="logo-text">SafeGuard</span>
+  </div>
+  <div class="header-status">
+    <div class="status-dot" id="header-status-dot"></div>
+    <span id="header-status-text">Protected</span>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════
+     SCREEN: HOME / MAP
+════════════════════════════════════ -->
+<main>
+
+<section id="screen-home" class="screen active">
+
+  <!-- Map -->
+  <div id="map"></div>
+
+  <!-- Sensor chips (top-left) -->
+  <div class="sensor-bar">
+    <div class="sensor-chip" id="chip-voice" onclick="Sensors.Voice.toggle()">
+      <div class="chip-dot"></div>
+      🎙️ Voice
+      <div class="db-meter"><div class="db-fill" id="db-fill"></div></div>
+    </div>
+    <div class="sensor-chip" id="chip-motion" onclick="Sensors.Motion.toggle()">
+      <div class="chip-dot"></div>
+      📲 Motion
+    </div>
+    <div class="sensor-chip" id="chip-poweroff" onclick="Sensors.PowerOff.toggle()">
+      <div class="chip-dot"></div>
+      🔋 Power-Off
+    </div>
+  </div>
+
+  <!-- Legend (top-right) -->
+  <div class="map-overlay-panel">
+    <div class="map-card">
+      <div class="card-title">Safety Legend</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ff1744"></div> Danger Zone</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ff6d00"></div> High Risk</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ffab40"></div> Moderate</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#c6ff00"></div> Low Risk</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#00e676"></div> Safe</div>
+    </div>
+    <div class="map-card" style="font-size:11px;color:var(--text-muted)">
+      <div class="card-title">Services</div>
+      <div style="margin-bottom:4px">🚔 Police</div>
+      <div style="margin-bottom:4px">🏥 Hospital</div>
+      <div>🏛️ Govt Office</div>
+    </div>
+  </div>
+
+  <!-- SOS Buttons -->
+  <div class="sos-dock">
+    <button class="sos-btn-primary" id="btn-primary-sos" onclick="handlePrimarySOS()" aria-label="Primary SOS Button">
+      🆘 SOS
+    </button>
+    <button class="sos-btn-secondary" id="btn-secondary-sos" onclick="SOS.triggerSecondary('manual')" aria-label="Auto Alert Button">
+      ⚠️ AUTO ALERT
+    </button>
+  </div>
+
+  <!-- Countdown bar -->
+  <div class="countdown-ring" id="countdown">
+    ⚡ Throw detected! Auto SOS in <span class="countdown-num" id="countdown-num">5</span>s
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════════════
+     SCREEN: CONTACTS
+════════════════════════════════════ -->
+<section id="screen-contacts" class="screen">
+  <div class="screen-content">
+    <div class="section-header">
+      <h1 class="section-title">👥 Contacts</h1>
+      <button class="btn-add" onclick="openAddContact()" id="btn-add-contact">
+        ➕ Add
+      </button>
+    </div>
+
+    <div class="info-box">
+      <span class="info-icon">💜</span>
+      <span><strong>Primary SOS</strong> sends an emergency SMS to all contacts listed here. The first contact is your primary emergency contact.</span>
+    </div>
+
+    <div id="contacts-list"></div>
+
+    <div class="divider">Emergency Services</div>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:8px">These are auto-dialed in Secondary / Auto SOS alerts</p>
+
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">🚔</div>
+        <div class="service-name">Police Emergency</div>
+        <div class="service-phone">100</div>
+        <div class="service-type">Police</div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🚑</div>
+        <div class="service-name">Ambulance</div>
+        <div class="service-phone">108</div>
+        <div class="service-type">Medical</div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🏛️</div>
+        <div class="service-name">Women Helpline</div>
+        <div class="service-phone">1091</div>
+        <div class="service-type">Government</div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">📞</div>
+        <div class="service-name">National Emergency</div>
+        <div class="service-phone">112</div>
+        <div class="service-type">All Services</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     SCREEN: SETTINGS
+════════════════════════════════════ -->
+<section id="screen-settings" class="screen">
+  <div class="screen-content">
+    <h1 class="section-title" style="margin-bottom:4px">⚙️ Settings</h1>
+
+    <!-- Profile -->
+    <div class="settings-section">
+      <div class="settings-section-title">Your Profile</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">Your Name</div>
+          <div class="settings-sublabel">Used in SOS messages</div>
+        </div>
+        <input type="text" class="input-field" id="input-username" placeholder="e.g. Priya" style="max-width:140px" />
+      </div>
+    </div>
+
+    <!-- Voice settings -->
+    <div class="settings-section">
+      <div class="settings-section-title">🎙️ Voice / Code Word</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">Enable Voice Monitor</div>
+          <div class="settings-sublabel">Listens for code word + loud screams</div>
+        </div>
+        <label class="toggle" for="toggle-voice">
+          <input type="checkbox" id="toggle-voice" onchange="onVoiceToggle(this)" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">Code Word</div>
+          <div class="settings-sublabel">Shout this word for auto SOS</div>
+        </div>
+        <input type="text" class="input-field" id="input-codeword" placeholder="help" style="max-width:120px" />
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">Trigger Threshold</div>
+          <div class="settings-sublabel">Min volume to trigger SOS</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="range" class="range-field" id="input-db" min="40" max="90" value="65" />
+          <span class="range-value" id="val-db">65 dB</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Motion settings -->
+    <div class="settings-section">
+      <div class="settings-section-title">📲 Motion / Throw Detection</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">Enable Motion Sensor</div>
+          <div class="settings-sublabel">Detects if phone is thrown or dropped</div>
+        </div>
+        <label class="toggle" for="toggle-motion">
+          <input type="checkbox" id="toggle-motion" onchange="onMotionToggle(this)" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">Throw Threshold</div>
+          <div class="settings-sublabel">Force required to trigger (m/s²)</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="range" class="range-field" id="input-motion-th" min="15" max="40" value="28" />
+          <span class="range-value" id="val-motion-th">28</span>
+        </div>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">Simulate Throw</div>
+          <div class="settings-sublabel">Test motion trigger (desktop)</div>
+        </div>
+        <button class="btn-add" style="font-size:12px;padding:8px 14px" onclick="Sensors.Motion.simulateThrow()" id="btn-simulate-throw">
+          🔬 Test
+        </button>
+      </div>
+    </div>
+
+    <!-- Power-off settings -->
+    <div class="settings-section">
+      <div class="settings-section-title">🔋 Power-Off Detection</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">Enable Power-Off Alert</div>
+          <div class="settings-sublabel">Auto SOS if phone turns off / tab closes</div>
+        </div>
+        <label class="toggle" for="toggle-poweroff">
+          <input type="checkbox" id="toggle-poweroff" onchange="onPowerOffToggle(this)" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- How it works -->
+    <div class="settings-section">
+      <div class="settings-section-title">ℹ️ How It Works</div>
+      <div style="padding:16px;font-size:13px;color:var(--text-secondary);line-height:1.8">
+        <div style="margin-bottom:12px"><strong style="color:var(--sos-red)">🆘 Primary SOS</strong><br>Manually pressed → Sends SMS to your emergency contacts with your GPS location.</div>
+        <div style="margin-bottom:12px"><strong style="color:var(--sos-orange)">⚠️ Secondary SOS (Auto)</strong><br>Triggered by: voice code word, device throw, or power-off. Sends alert to nearest police, hospitals &amp; govt offices.</div>
+        <div><strong style="color:var(--accent)">🗺️ Heatmap</strong><br>Shows street-level safety ratings. Red = danger, green = safe. Tap any zone for details.</div>
+      </div>
+    </div>
+
+    <button class="btn-save" id="btn-save-settings" onclick="saveSettingsAndApply()">💾 Save Settings</button>
+  </div>
+</section>
+
+</main>
+
+<!-- ═══════════════════════════════════
+     BOTTOM NAV
+════════════════════════════════════ -->
+<nav class="nav-bar">
+  <button class="nav-item active" id="nav-home" onclick="navigate('home')" aria-label="Map">
+    <span class="nav-icon">🗺️</span>
+    <span>Map</span>
+  </button>
+  <button class="nav-item" id="nav-contacts" onclick="navigate('contacts')" aria-label="Contacts">
+    <span class="nav-icon">👥</span>
+    <span>Contacts</span>
+  </button>
+  <button class="nav-item" id="nav-settings" onclick="navigate('settings')" aria-label="Settings">
+    <span class="nav-icon">⚙️</span>
+    <span>Settings</span>
+  </button>
+</nav>
+
+<!-- ═══════════════════════════════════
+     SOS OVERLAY
+════════════════════════════════════ -->
+<div class="sos-overlay" id="sos-overlay">
+  <div class="sos-overlay-bg"></div>
+  <div class="sos-overlay-content">
+
+    <div class="sos-ring">
+      <span class="sos-ring-icon" id="sos-icon">🆘</span>
+    </div>
+
+    <div class="sos-type-label" id="sos-type-label">PRIMARY SOS</div>
+
+    <div class="sos-message-preview">
+      <div class="msg-label">SOS Message Preview</div>
+      <div class="msg-text" id="sos-msg-text">Building message…</div>
+    </div>
+
+    <div class="sos-recipients" id="sos-recipients"></div>
+
+    <div class="sos-actions">
+      <button class="btn-dismiss" id="btn-dismiss-sos" onclick="SOS.dismiss()">✕ Cancel</button>
+      <button class="btn-confirm-sos" id="btn-confirm-sos">📲 Send All Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     ADD CONTACT MODAL
+════════════════════════════════════ -->
+<div class="modal-backdrop" id="modal-contact" onclick="handleModalBackdropClick(event)">
+  <div class="modal-sheet" id="modal-sheet">
+    <h2 class="modal-title">➕ Add Emergency Contact</h2>
+    <div class="form-group">
+      <label class="form-label" for="input-contact-name">Full Name</label>
+      <input type="text" class="input-field" id="input-contact-name" placeholder="e.g. Divya Shah" />
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="input-contact-phone">Phone Number</label>
+      <input type="tel" class="input-field" id="input-contact-phone" placeholder="+91 98765 43210" />
+    </div>
+    <div class="info-box" style="margin-bottom:16px">
+      <span class="info-icon">💡</span>
+      <span>Include country code (e.g., +91 for India). This person will receive your Primary SOS SMS with your live location.</span>
+    </div>
+    <button class="btn-save" id="btn-save-contact" onclick="saveContact()">✅ Save Contact</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     TOAST CONTAINER
+════════════════════════════════════ -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ═══════════════════════════════════
+     SCRIPTS
+════════════════════════════════════ -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="sos.js"></script>
+<script src="sensor.js"></script>
+<script src="map.js"></script>
+<script src="app.js"></script>
+
+<script>
+/* ── Handler Glue ── */
+async function handlePrimarySOS() {
+  const btn = document.getElementById('btn-primary-sos');
+  if (btn.disabled) return;
+  
+  const ogText = btn.innerHTML;
+  btn.innerHTML = '⏳ Loading...';
+  btn.disabled = true;
+  
+  if (AppState.contacts.length === 0) {
+    App.showToast('⚠️ No emergency contacts! Go to Contacts to add one.', 'warning');
+    navigate('contacts');
+    btn.innerHTML = ogText;
+    btn.disabled = false;
+    return;
+  }
+  btn.innerHTML = ogText;
+  btn.disabled = false;
+  SOS.triggerPrimary();
+}
+
+function handleModalBackdropClick(e) {
+  if (e.target === document.getElementById('modal-contact')) closeAddContact();
+}
+
+function onVoiceToggle(el) {
+  const s = AppState.settings;
+  s.voiceEnabled = el.checked;
+  AppState.settings = s;
+  el.checked ? Sensors.Voice.start() : Sensors.Voice.stop();
+  if (typeof updateHeaderStatus === 'function') updateHeaderStatus();
+}
+
+function onMotionToggle(el) {
+  const s = AppState.settings;
+  s.motionEnabled = el.checked;
+  AppState.settings = s;
+  el.checked ? Sensors.Motion.start() : Sensors.Motion.stop();
+  if (typeof updateHeaderStatus === 'function') updateHeaderStatus();
+}
+
+function onPowerOffToggle(el) {
+  const s = AppState.settings;
+  s.powerOffEnabled = el.checked;
+  AppState.settings = s;
+  el.checked ? Sensors.PowerOff.start() : Sensors.PowerOff.stop();
+  if (typeof updateHeaderStatus === 'function') updateHeaderStatus();
+}
+
+function saveSettingsAndApply() {
+  saveSettings();
+  applySensorToggles();
+  updateHeaderStatus();
+}
+
+function updateHeaderStatus() {
+  const dot = document.getElementById('header-status-dot');
+  const text = document.getElementById('header-status-text');
+  if (!dot || !text) return;
+  
+  if (SOS.isActive()) {
+    dot.className = 'status-dot danger';
+    text.textContent = 'Alert Active';
+  } else if (Sensors.Voice.isActive() || Sensors.Motion.isActive() || Sensors.PowerOff.isActive()) {
+    dot.className = 'status-dot warning';
+    text.textContent = 'Monitoring';
+  } else {
+    dot.className = 'status-dot';
+    text.textContent = 'Safe / Inactive';
+  }
+}
+
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then(registration => {
+      console.log('SW registered: ', registration.scope);
+    }).catch(err => {
+      console.log('SW registration failed: ', err);
+    });
+  });
+}
+</script>
+
+</body>
+</html>

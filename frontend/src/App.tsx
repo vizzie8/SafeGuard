@@ -8,12 +8,14 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Admin from './pages/Admin';
 import { SettingsProvider } from './context/SettingsContext';
+import { ParticleWaveBackground } from './components/ParticleWaveBackground';
 
 function App() {
   return (
     <SettingsProvider>
       <Router>
-        <div className="min-h-screen bg-[#0a0a0c]">
+        <div className="min-h-screen bg-transparent text-slate-900 dark:text-white transition-colors duration-300">
+          <ParticleWaveBackground />
           <Navbar />
           <Routes>
             <Route path="/" element={<Home />} />

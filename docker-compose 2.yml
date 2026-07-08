@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: safeguard
+      POSTGRES_PASSWORD: safeguard_password
+      POSTGRES_DB: safeguard
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_URL=postgres://safeguard:safeguard_password@db:5432/safeguard
+      - TWILIO_SID=${TWILIO_SID}
+      - TWILIO_AUTH=${TWILIO_AUTH}
+      - TWILIO_PHONE=${TWILIO_PHONE}
+    depends_on:
+      - db
+    volumes:
+      - ./frontend:/frontend
+
+volumes:
+  pgdata:

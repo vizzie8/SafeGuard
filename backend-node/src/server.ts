@@ -48,6 +48,27 @@ app.use('/api/admin', adminRoutes);
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
   
+  socket.on('join-admin', () => {
+    console.log('Admin joined:', socket.id);
+    socket.join('admin-room');
+  });
+
+  socket.on('webrtc-offer', (data) => {
+    socket.to('admin-room').emit('webrtc-offer', { offer: data.offer, from: socket.id });
+  });
+
+  socket.on('webrtc-answer', (data) => {
+    io.to(data.to).emit('webrtc-answer', { answer: data.answer });
+  });
+
+  socket.on('webrtc-ice-candidate', (data) => {
+    if (data.to) {
+      io.to(data.to).emit('webrtc-ice-candidate', data);
+    } else {
+      socket.to('admin-room').emit('webrtc-ice-candidate', data);
+    }
+  });
+
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
   });
