@@ -214,20 +214,6 @@ This is a working demonstration project, not a production-ready safety service. 
 - **Power-off detection is best-effort.** `beforeunload` is unreliable, and the Battery API is deprecated/removed in many browsers.
 - **Database provider is inconsistent** between the Prisma schema (SQLite) and the deployment config (PostgreSQL); PostgreSQL is the intended target.
 Treating these as a real safety product would require hardening, redundant delivery channels, and formal reliability testing.
- 
----
- 
-## Security Notes
- 
-Security items identified in this codebase, with intended fixes:
- 
-- **Committed secrets** in `.env` → gitignore, rotate, remove hardcoded fallbacks (e.g. `|| 'safeguard_secret'`).
-- **Wide-open CORS** (`origin: '*'`) on Express and Socket.io → restrict to known origins in production.
-- **XSS risk** in prototype contact rendering (`innerHTML` interpolation) → escape/sanitize user input or use `textContent`.
-- **Per-file Prisma clients** → use a single shared `PrismaClient` instance to avoid connection-pool exhaustion.
-- **JWT has no revocation** before expiry → consider short-lived access tokens + refresh tokens for a real deployment.
-Existing good practices: bcrypt password hashing (salted, 10 rounds), JWT-based stateless auth, `helmet` security headers, and IP rate limiting.
- 
 ---
  
 ## Roadmap
@@ -237,7 +223,6 @@ Existing good practices: bcrypt password hashing (salted, 10 rounds), JWT-based 
 - [ ] Add a TURN server for reliable WebRTC connectivity
 - [ ] Replace curated zones with data-driven risk scoring
 - [ ] Add automated tests around the SOS trigger paths
-- [ ] Harden security items listed above
 - [ ] Background/offline SOS via a service worker
 ---
  
