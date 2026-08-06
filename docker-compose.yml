@@ -1,16 +1,17 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres:15-alpine
+  pmysql:
+    image: mysql:8
     environment:
-      POSTGRES_USER: safeguard
-      POSTGRES_PASSWORD: safeguard_password
-      POSTGRES_DB: safeguard_db
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_USER: safeguard
+      MYSQL_PASSWORD: safeguard_password
+      MYSQL_DATABASE: safeguard_db
     ports:
-      - "5432:5432"
+      - "3306:3306"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mysql_data:/var/lib/mysql
 
   redis:
     image: redis:7-alpine
