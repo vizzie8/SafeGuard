@@ -18,7 +18,6 @@ Built for the Pune region as a demonstration; the risk-zone data and emergency-s
 - [Getting Started](#getting-started)
 - [Environment Variables](#environment-variables)
 - [Project Status & Honest Limitations](#project-status--honest-limitations)
-- [Security Notes](#security-notes)
 - [Roadmap](#roadmap)
 ---
  
@@ -91,7 +90,7 @@ The important design decision: **application data travels client → server → 
 | Auth | JWT + bcrypt | Stateless auth, hashed passwords |
 | AI service | FastAPI, Pydantic | Risk-scoring endpoint (stub) |
 | Sensors | Web Audio, SpeechRecognition, DeviceMotion, Battery, Geolocation APIs | Multi-trigger detection |
-| Infra | Docker Compose | Postgres + Redis containers |
+| Infra | Docker Compose | MYSQL + Redis containers |
  
 ---
  
