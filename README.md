@@ -1,4 +1,4 @@
-# SafeGuard 🛡️
+# SafeGuard 
  
 **A personal-safety web app with multi-trigger SOS, a live risk-zone map, and real-time distress video streaming.**
  
@@ -198,7 +198,7 @@ Just open `index.html` in a browser (best on a phone or with device emulation) �
 | `JWT_SECRET` | Secret used to sign JWTs — **must be a strong, secret value** |
 | `PORT` | API port (default 4000) |
  
-> ⚠️ **Never commit real secrets.** Add `.env` to `.gitignore`, use a `.env.example` with placeholder values, and rotate any secret that has ever been committed.
+>  **Never commit real secrets.** Add `.env` to `.gitignore`, use a `.env.example` with placeholder values, and rotate any secret that has ever been committed.
  
 ---
  
