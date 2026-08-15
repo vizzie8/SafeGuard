@@ -61,7 +61,7 @@ SafeGuard is a **three-tier client–server application** with a real-time peer-
 │  · Socket.io signaling       │   │    (RAG/FAISS — planned)   │
 │         │ Prisma ORM         │   └───────────────────────────┘
 │         ▼                    │
-│   MYSQL   +   Redis     │
+│   MySQL   +   Redis     │
 └──────────────────────────────┘
  
         VICTIM ⇄ ADMIN video flows PEER-TO-PEER over WebRTC —
